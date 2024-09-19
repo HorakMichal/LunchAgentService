@@ -61,6 +61,18 @@ public class RestaurantService : IRestaurantService
                 Name = "Budvarka",
                 Url = "http://www.menicka.cz/api/iframe/?id=5881&bg=vhite&color=black&size=18&datum=dnes",
                 Emoji = "\uD83C\uDF77"
+            },
+            new()
+            {
+                Name = "Legenda",
+                Url = "http://www.menicka.cz/api/iframe/?id=680&bg=vhite&color=black&size=18&datum=dnes",
+                Emoji = "\uD83E\uDD69"
+            },
+            new()
+            {
+                Name = "Umbrella",
+                Url = "http://www.menicka.cz/api/iframe/?id=8292&bg=vhite&color=black&size=18&datum=dnes",
+                Emoji = "\u2602"
             }
         };
     }
