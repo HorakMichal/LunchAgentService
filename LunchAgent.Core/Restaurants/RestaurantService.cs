@@ -2,7 +2,7 @@
 
 namespace LunchAgent.Core.Restaurants;
 
-public class RestaurantService : IRestaurantService
+public sealed class RestaurantService : IRestaurantService
 {
     public IReadOnlyCollection<Restaurant> Get()
     {

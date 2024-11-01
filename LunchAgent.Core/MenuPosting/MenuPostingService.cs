@@ -8,46 +8,35 @@ using Microsoft.Extensions.Logging;
 
 namespace LunchAgent.Core.MenuPosting;
 
-public class MenuPostingService : IMenuPostingService
+public sealed class MenuPostingService(
+    ILogger logger,
+    IRestaurantService restaurantService,
+    IMenuReadingService menuReadingService,
+    IGoogleChatService googleChatService,
+    IStoredMessagesService storedMessagesService)
+    : IMenuPostingService
 {
-    private readonly ILogger _logger;
-    private readonly IRestaurantService _restaurantService;
-    private readonly IMenuReadingService _menuReadingService;
-    private readonly IGoogleChatService _googleChatService;
-    private readonly IStoredMessagesService _storedMessagesService;
-
-    public MenuPostingService(ILogger logger, IRestaurantService restaurantService,
-        IMenuReadingService menuReadingService, IGoogleChatService googleChatService,
-        IStoredMessagesService storedMessagesService)
-    {
-        _logger = logger;
-        _restaurantService = restaurantService;
-        _menuReadingService = menuReadingService;
-        _googleChatService = googleChatService;
-        _storedMessagesService = storedMessagesService;
-    }
-
     public async Task PostMenus()
     {
         var today = DateTime.Today;
 
-        _logger.LogInformation("Getting restaurant settings.");
-        var restaurants = _restaurantService.Get();
+        logger.LogInformation("Getting restaurant settings.");
+        var restaurants = restaurantService.Get();
 
-        _logger.LogInformation("Getting menus for restaurants.");
-        var menus = _menuReadingService.GetMenus(restaurants);
+        logger.LogInformation("Getting menus for restaurants.");
+        var menus = menuReadingService.GetMenus(restaurants);
 
-        _logger.LogInformation("Getting available spaces.");
-        var spaces = await _googleChatService.GetSpaces();
+        logger.LogInformation("Getting available spaces.");
+        var spaces = await googleChatService.GetSpaces();
 
         spaces = spaces.Where(x => x.DisplayName == "_Lunch Agent ZL - TEST").ToList();
 
-        _logger.LogInformation("Start sending messages.");
+        logger.LogInformation("Start sending messages.");
         foreach (var space in spaces)
         {
-            _logger.LogInformation("Sending message to {spaceName} ({spaceId}) space.", space.DisplayName, space.Name);
+            logger.LogInformation("Sending message to {spaceName} ({spaceId}) space.", space.DisplayName, space.Name);
 
-            var storedMessageName = await _storedMessagesService.Get(space.Name, today);
+            var storedMessageName = await storedMessagesService.Get(space.Name, today);
 
             var menuText = GetMenuText(menus);
             var now = DateTime.Now;
@@ -59,10 +48,10 @@ public class MenuPostingService : IMenuPostingService
             };
 
             var messageResponse = string.IsNullOrEmpty(storedMessageName)
-                ? await _googleChatService.CreateMessage(message, space.Name)
-                : await _googleChatService.UpdateMessage(message, storedMessageName);
+                ? await googleChatService.CreateMessage(message, space.Name)
+                : await googleChatService.UpdateMessage(message, storedMessageName);
 
-            await _storedMessagesService.Store(space.Name, today, messageResponse.Name);
+            await storedMessagesService.Store(space.Name, today, messageResponse.Name);
         }
     }
 

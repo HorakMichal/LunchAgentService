@@ -8,14 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace LunchAgent.Core.Menus;
 
-public class MenuReadingService : IMenuReadingService
+public sealed class MenuReadingService(ILogger log) : IMenuReadingService
 {
-    private ILogger Log { get; }
-
-    public MenuReadingService(ILogger log)
-    {
-        Log = log;
-    }
+    private ILogger Log { get; } = log;
 
     public List<RestaurantMenu> GetMenus(IReadOnlyCollection<Restaurant> restaurants)
     {
@@ -60,7 +55,7 @@ public class MenuReadingService : IMenuReadingService
                 Log.LogDebug($"Failed to parse menu from {restaurant.Name}", e);
             }
 
-            Log.LogDebug($"Sucessfully got menu from {restaurant.Name}");
+            Log.LogDebug($"Successfully got menu from {restaurant.Name}");
         }
 
         return result;
@@ -136,25 +131,18 @@ public class MenuReadingService : IMenuReadingService
 
     private static string GetTodayInCzech()
     {
-        switch (DateTime.Today.DayOfWeek)
+        return DateTime.Today.DayOfWeek switch
         {
-            case DayOfWeek.Monday:
-                return "Pondělí";
-            case DayOfWeek.Tuesday:
-                return "Úterý";
-            case DayOfWeek.Wednesday:
-                return "Středa";
-            case DayOfWeek.Thursday:
-                return "Čtvrtek";
-            case DayOfWeek.Friday:
-                return "Pátek";
+            DayOfWeek.Monday => "Pondělí",
+            DayOfWeek.Sunday => "Úterý",
+            DayOfWeek.Tuesday => "Středa",
+            DayOfWeek.Wednesday => "Čtvrtek",
+            DayOfWeek.Thursday => "Pátek",
 #if DEBUG
-            case DayOfWeek.Saturday:
-            case DayOfWeek.Sunday:
-                return "Pátek";
+            DayOfWeek.Friday => "Pátek",
+            DayOfWeek.Saturday => "Pátek",
 #endif
-        }
-
-        return string.Empty;
+            _ => string.Empty
+        };
     }
 }

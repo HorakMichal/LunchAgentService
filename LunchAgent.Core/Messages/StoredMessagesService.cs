@@ -1,11 +1,9 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
-using Azure;
+﻿using Azure;
 using Azure.Data.Tables;
 
 namespace LunchAgent.Core.Messages;
 
-public class StoredMessagesService : IStoredMessagesService
+public sealed class StoredMessagesService : IStoredMessagesService
 {
     private readonly TableClient _tableClient;
 
@@ -45,7 +43,7 @@ public class StoredMessagesService : IStoredMessagesService
     private static string GetRowKey(DateTime day)
         => $"{day.Day}{day.Month}{day.Year}";
 
-    public class StoredMessageEntity : ITableEntity
+    private class StoredMessageEntity : ITableEntity
     {
         /// <summary>
         /// Space Name

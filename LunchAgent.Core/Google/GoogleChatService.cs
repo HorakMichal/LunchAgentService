@@ -5,7 +5,7 @@ using Google.Apis.Services;
 
 namespace LunchAgent.Core.Google;
 
-public class GoogleChatService : IGoogleChatService
+public sealed class GoogleChatService : IGoogleChatService
 {
     private readonly HangoutsChatService _chatService;
 
