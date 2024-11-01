@@ -1,8 +1,8 @@
 # LunchAgentService
 
-.NET Core 2.2 Web API application used for posting lunch menus to slack. 
+.NET 8 Application for posting lunch menus to Google Chat
 
-This is basically a version 2.0 of my previous project [LunchAgent](https://github.com/ArtzTJU/LunchAgent)
+Updated version of [LunchAgent](https://github.com/Tomas-Juri/LunchAgentService) to also work with Webhooks
 
 Application is using [menicka.cz](https://www.menicka.cz) website for getting data
 
