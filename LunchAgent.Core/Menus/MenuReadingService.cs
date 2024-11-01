@@ -2,16 +2,13 @@
 using LunchAgent.Core.Menus.Entities;
 using LunchAgent.Core.Restaurants.Entitties;
 using Microsoft.Extensions.Logging;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace LunchAgent.Core.Menus;
 
-public sealed class MenuReadingService(ILogger log) : IMenuReadingService
+public sealed class MenuReadingService(ILogger logger) : IMenuReadingService
 {
-    private ILogger Log { get; } = log;
-
     public List<RestaurantMenu> GetMenus(IReadOnlyCollection<Restaurant> restaurants)
     {
         var result = new List<RestaurantMenu>();
@@ -21,21 +18,19 @@ public sealed class MenuReadingService(ILogger log) : IMenuReadingService
 
         foreach (var restaurant in restaurants)
         {
-            // TODO Do htttp client
-            using (var client = new WebClient())
+            try
             {
-                try
-                {
-                    var data = restaurant.Url.Contains("makalu")
-                        ? Encoding.UTF8.GetString(client.DownloadData(restaurant.Url))
-                        : Encoding.GetEncoding(1250).GetString(client.DownloadData(restaurant.Url));
+                using var client = new HttpClient();
 
-                    document.LoadHtml(data);
-                }
-                catch (Exception e)
-                {
-                    Log.LogDebug($"Failed to get menu from {restaurant.Name}", e);
-                }
+                var data = restaurant.Url.Contains("makalu")
+                    ? Encoding.UTF8.GetString(client.GetByteArrayAsync(restaurant.Url).Result)
+                    : Encoding.GetEncoding(1250).GetString(client.GetByteArrayAsync(restaurant.Url).Result);
+
+                document.LoadHtml(data);
+            }
+            catch (Exception e)
+            {
+                logger.LogDebug("Failed to get menu from {RestaurantName}. Exception: {Exception}", restaurant.Name, e);
             }
 
             try
@@ -44,18 +39,18 @@ public sealed class MenuReadingService(ILogger log) : IMenuReadingService
                     ? ParseMenuFromMakalu(document.DocumentNode)
                     : ParseMenuFromMenicka(document.DocumentNode);
 
-                result.Add(new RestaurantMenu()
+                result.Add(new RestaurantMenu
                 {
                     Items = parsedMenu,
-                    Restaurant = restaurant with { }
+                    Restaurant = restaurant
                 });
             }
             catch (Exception e)
             {
-                Log.LogDebug($"Failed to parse menu from {restaurant.Name}", e);
+                logger.LogDebug("Failed to parse menu from {RestaurantName}. Exception: {Exception}", restaurant.Name, e);
             }
 
-            Log.LogDebug($"Successfully got menu from {restaurant.Name}");
+            logger.LogDebug("Successfully got menu from {RestaurantName}", restaurant.Name);
         }
 
         return result;
