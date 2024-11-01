@@ -41,7 +41,7 @@ public sealed class RestaurantService : IRestaurantService
             new()
             {
                 Name = "Bistro a café Baltaci",
-                Url = "http://www.menicka.cz/api/iframe/?id=5696&bg=vhite&color=black&size=18&datum=dnes",
+                Url = "http://www.menicka.cz/api/iframe/?id=6674&bg=vhite&color=black&size=18&datum=dnes",
                 Emoji = "\uD83D\uDFE5"
             },
             new()
@@ -73,6 +73,12 @@ public sealed class RestaurantService : IRestaurantService
                 Name = "Umbrella",
                 Url = "http://www.menicka.cz/api/iframe/?id=8292&bg=vhite&color=black&size=18&datum=dnes",
                 Emoji = "\u2602"
+            },
+            new()
+            {
+                Name = "TOM Restaurant",
+                Url = "http://www.menicka.cz/api/iframe/?id=8945&bg=vhite&color=black&size=18&datum=dnes",
+                Emoji = "🍣"
             }
         };
     }

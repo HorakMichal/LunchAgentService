@@ -17,10 +17,12 @@ public sealed class Worker(
         {
             var now = DateTime.UtcNow;
             var nextExecutionTime = schedule.GetNextOccurrence(now);
+            var remainingTime = nextExecutionTime - now;
 
-            logger.LogInformation("Next menu post will happen at {NextTime} UTC", nextExecutionTime);
+            logger.LogInformation("Next menu post will happen at {NextTime} UTC.", nextExecutionTime);
+            logger.LogDebug("Next post in {Minutes} minutes.", Math.Round(remainingTime.TotalMinutes));
 
-            await Task.Delay(nextExecutionTime - now, stoppingToken);
+            //await Task.Delay(remainingTime, stoppingToken);
 
             await PostMenus();
         }
