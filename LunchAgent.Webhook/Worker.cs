@@ -22,7 +22,7 @@ public sealed class Worker(
             logger.LogInformation("Next menu post will happen at {NextTime} UTC.", nextExecutionTime);
             logger.LogDebug("Next post in {Minutes} minutes.", Math.Round(remainingTime.TotalMinutes));
 
-            //await Task.Delay(remainingTime, stoppingToken);
+            await Task.Delay(remainingTime, stoppingToken);
 
             await PostMenus();
         }
