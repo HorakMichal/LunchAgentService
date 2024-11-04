@@ -18,6 +18,8 @@ public sealed class MenuReadingService(ILogger logger) : IMenuReadingService
 
         foreach (var restaurant in restaurants)
         {
+            logger.LogDebug("Reading menu for restaurant {RestaurantName} from address {RestaurantAddress}", restaurant.Name, restaurant.Url);
+
             try
             {
                 using var client = new HttpClient();
@@ -50,7 +52,13 @@ public sealed class MenuReadingService(ILogger logger) : IMenuReadingService
                 logger.LogDebug("Failed to parse menu from {RestaurantName}. Exception: {Exception}", restaurant.Name, e);
             }
 
-            logger.LogDebug("Successfully got menu from {RestaurantName}", restaurant.Name);
+            if (!logger.IsEnabled(LogLevel.Debug)) 
+                continue;
+
+            var menu = new StringBuilder().CreateMenuForRestaurant(result.Last());
+
+            logger.LogDebug("Successfully got menu from {RestaurantName}. Menu: {Menu}", restaurant.Name, menu.ToString());
+
         }
 
         return result;

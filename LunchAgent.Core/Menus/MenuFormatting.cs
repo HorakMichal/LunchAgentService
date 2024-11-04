@@ -14,20 +14,27 @@ public static class MenuFormatting
 
         foreach (var menu in menus)
         {
-            var soups = string.Join("\n", menu.Items
-                .Where(item => item.FoodType == FoodType.Soup)
-                .Select(item => $"_{item.Description.Trim()}_ {item.Price}"));
-
-            var mains = string.Join("\n", menu.Items
-                .Where(item => item.FoodType == FoodType.Main)
-                .Select((item, index) => $"  {index + 1}. {item.Description} {item.Price}"));
-
-            var items = string.Join("\n", soups, mains).Trim('\n');
-
-            message.Append($"{menu.Restaurant.Emoji} *{menu.Restaurant.Name}:* \n {items}\n\n");
+            message.CreateMenuForRestaurant(menu);
         }
 
         return message.ToString();
+    }
+
+    public static StringBuilder CreateMenuForRestaurant(this StringBuilder message, RestaurantMenu menu)
+    {
+        var soups = string.Join("\n", menu.Items
+            .Where(item => item.FoodType == FoodType.Soup)
+            .Select(item => $"_{item.Description.Trim()}_ {item.Price}"));
+
+        var mains = string.Join("\n", menu.Items
+            .Where(item => item.FoodType == FoodType.Main)
+            .Select((item, index) => $"  {index + 1}. {item.Description} {item.Price}"));
+
+        var items = string.Join("\n", soups, mains).Trim('\n');
+
+        message.Append($"{menu.Restaurant.Emoji} *{menu.Restaurant.Name}:* \n {items}\n\n");
+
+        return message;
     }
 
     public static StringContent CreateHttpRequest(this string menu)
