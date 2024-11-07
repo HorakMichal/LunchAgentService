@@ -162,13 +162,13 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
         return DateTime.Today.DayOfWeek switch
         {
             DayOfWeek.Monday => "Pondělí",
-            DayOfWeek.Sunday => "Úterý",
-            DayOfWeek.Tuesday => "Středa",
-            DayOfWeek.Wednesday => "Čtvrtek",
-            DayOfWeek.Thursday => "Pátek",
-#if DEBUG
+            DayOfWeek.Tuesday => "Úterý",
+            DayOfWeek.Wednesday => "Středa",
+            DayOfWeek.Thursday => "Čtvrtek",
             DayOfWeek.Friday => "Pátek",
+#if DEBUG
             DayOfWeek.Saturday => "Pátek",
+            DayOfWeek.Sunday => "Pátek",
 #endif
             _ => string.Empty
         };
