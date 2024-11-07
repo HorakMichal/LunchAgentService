@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using LunchAgent.Core.Google;
 using LunchAgent.Core.MenuPosting;
 using LunchAgent.Core.Menus;
+using LunchAgent.Core.Menus.Entities;
 using LunchAgent.Core.Messages;
 using LunchAgent.Core.Restaurants;
 using Microsoft.Azure.WebJobs;
@@ -26,8 +27,14 @@ public static class PostMenus
         if (googleCreds == null)
             throw new Exception("Google credentials cannot be null");
 
+        var settings = new HtmlClientSettings
+        {
+            Attempts = 5,
+            AttemptDelay = 5000
+        };
+
         var restaurantService = new RestaurantService();
-        var menuReadingService = new MenuReadingService(logger);
+        var menuReadingService = new MenuReadingService(logger, settings);
 
         menuReadingService.GetMenus(restaurantService.Get());
         

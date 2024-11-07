@@ -1,4 +1,5 @@
 using LunchAgent.Core.Menus;
+using LunchAgent.Core.Menus.Entities;
 using LunchAgent.Core.Restaurants;
 using Microsoft.Extensions.Options;
 using NCrontab;
@@ -8,6 +9,7 @@ namespace LunchAgent.Webhook;
 public sealed class Worker(
     ILogger<Worker> logger, 
     IOptions<LunchAgentSettings> settings,
+    IOptions<HtmlClientSettings> htmlClientSettings,
     IHttpClientFactory clientFactory) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -33,7 +35,7 @@ public sealed class Worker(
         logger.LogInformation("PostMenus function started at: {Time}", DateTime.UtcNow);
 
         var restaurantService = new RestaurantService();
-        var menuReadingService = new MenuReadingService(logger);
+        var menuReadingService = new MenuReadingService(logger, htmlClientSettings.Value);
 
         var menus = menuReadingService
             .GetMenus(restaurantService.Get())

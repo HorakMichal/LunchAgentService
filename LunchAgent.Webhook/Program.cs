@@ -1,3 +1,4 @@
+using LunchAgent.Core.Menus.Entities;
 using LunchAgent.Webhook;
 
 var host = Host.CreateDefaultBuilder(args)
@@ -18,6 +19,9 @@ var host = Host.CreateDefaultBuilder(args)
             .Validate(settings => !string.IsNullOrEmpty(settings.Timing),
                 """The configuration value "ConnectionString:Timing" must be defined and not empty!""")
             .ValidateOnStart();
+
+        services.AddOptions<HtmlClientSettings>()
+            .BindConfiguration("HtmlClientSettings");
 
         services.AddHttpClient();
 

@@ -7,12 +7,11 @@ using System.Text.RegularExpressions;
 
 namespace LunchAgent.Core.Menus;
 
-public sealed class MenuReadingService(ILogger logger) : IMenuReadingService
+public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settings) : IMenuReadingService
 {
     public List<RestaurantMenu> GetMenus(IReadOnlyCollection<Restaurant> restaurants)
     {
         var result = new List<RestaurantMenu>();
-        var document = new HtmlDocument();
 
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
@@ -20,19 +19,16 @@ public sealed class MenuReadingService(ILogger logger) : IMenuReadingService
         {
             logger.LogDebug("Reading menu for restaurant {RestaurantName} from address {RestaurantAddress}", restaurant.Name, restaurant.Url);
 
-            try
+            var document = GetMenu(restaurant);
+            if (document is null)
             {
-                using var client = new HttpClient();
-
-                var data = restaurant.Url.Contains("makalu")
-                    ? Encoding.UTF8.GetString(client.GetByteArrayAsync(restaurant.Url).Result)
-                    : Encoding.GetEncoding(1250).GetString(client.GetByteArrayAsync(restaurant.Url).Result);
-
-                document.LoadHtml(data);
-            }
-            catch (Exception e)
-            {
-                logger.LogDebug("Failed to get menu from {RestaurantName}. Exception: {Exception}", restaurant.Name, e);
+                logger.LogWarning("Failed to get menu from {RestaurantName}. Check logged exceptions", restaurant.Name);
+                result.Add(new RestaurantMenu
+                {
+                    Restaurant = restaurant,
+                    Items = []
+                });
+                continue;
             }
 
             try
@@ -62,6 +58,35 @@ public sealed class MenuReadingService(ILogger logger) : IMenuReadingService
         }
 
         return result;
+    }
+
+    private HtmlDocument? GetMenu(Restaurant restaurant)
+    {
+        HtmlDocument document = new();
+
+        for (var i = 1; i <= settings.Attempts; i++)
+        {
+            try
+            {
+                using var client = new HttpClient();
+
+                var requestResult = client.GetByteArrayAsync(restaurant.Url).Result;
+
+                var data = restaurant.Url.Contains("makalu")
+                    ? Encoding.UTF8.GetString(requestResult)
+                    : Encoding.GetEncoding(1250).GetString(requestResult);
+
+                document.LoadHtml(data);
+                return document;
+            }
+            catch (Exception e)
+            {
+                logger.LogWarning("Failed to get menu from {RestaurantName}. Attempt: {Attempt}. Exception: {Exception}", restaurant.Name, i, e);
+                Task.Delay(settings.AttemptDelay);
+            }
+        }
+
+        return null;
     }
 
     private static List<RestaurantMenuItem> ParseMenuFromMenicka(HtmlNode todayMenu)
