@@ -39,15 +39,20 @@ public sealed class Worker(
 
         var menus = menuReadingService
             .GetMenus(restaurantService.Get())
-            .CreateMenuMessage();
+            .CreateMenuMessages(settings.Value.MaximumMessageSize ?? int.MaxValue);
 
         var client = clientFactory.CreateClient();
 
-        var response = await client.PostAsync(settings.Value.ConnectionString, menus
-            .CreateHttpRequest());
+        foreach (var menu in menus)
+        {
+            var response = await client.PostAsync(settings.Value.ConnectionString, menu
+                .CreateHttpRequest());
         
-        if(!response.IsSuccessStatusCode)
-            logger.LogError("Request to Google Chat ended with code: {Code}", response.StatusCode);
+            if(!response.IsSuccessStatusCode)
+                logger.LogError("Request to Google Chat ended with code: {Code}", response.StatusCode);
+
+            await Task.Delay(1000);
+        }
         
         logger.LogInformation("PostMenus function ended at: {Time}", DateTime.UtcNow);
     }

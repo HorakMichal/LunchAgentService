@@ -5,19 +5,44 @@ namespace LunchAgent.Core.Menus;
 
 public static class MenuFormatting
 {
-    public static string CreateMenuMessage(this List<RestaurantMenu> menus)
+    private static string MessageHeader(DateTime date, string messagePart) =>
+        $"*Meníčka na den {date.Day}/{date.Month}/{date.Year}* {messagePart}\n\n";
+
+    public static List<string> CreateMenuMessages(this List<RestaurantMenu> menus, int maximumMessageSize)
     {
         var now = DateTime.Now;
 
-        StringBuilder message = new();
-        message.Append($"*Meníčka na den {now.Day}/{now.Month}/{now.Year}*\n\n");
+        List<string> messages = [];
 
+        StringBuilder message = new();
+    
         foreach (var menu in menus)
         {
             message.CreateMenuForRestaurant(menu);
+
+            if (message.Length < maximumMessageSize) 
+                continue;
+
+            message.Insert(0, MessageHeader(now, "Část " + (messages.Count + 1)));
+
+            message.Replace('"', '\'');
+
+            messages.Add(message.ToString());
+            message.Clear();
         }
 
-        return message.ToString();
+        if (message.Length <= 0) 
+            return messages;
+
+        message.Insert(0, messages.Count > 0
+            ? MessageHeader(now, "Část " + (messages.Count + 1)) 
+            : MessageHeader(now, string.Empty));
+
+        message.Replace('"', '\'');
+
+        messages.Add(message.ToString());
+
+        return messages;
     }
 
     public static StringBuilder CreateMenuForRestaurant(this StringBuilder message, RestaurantMenu menu)
