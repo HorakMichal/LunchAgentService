@@ -9,7 +9,7 @@ namespace LunchAgent.Core.Menus;
 
 public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settings) : IMenuReadingService
 {
-    public List<RestaurantMenu> GetMenus(IReadOnlyCollection<Restaurant> restaurants)
+    public async Task<List<RestaurantMenu>> GetMenus(IReadOnlyCollection<Restaurant> restaurants)
     {
         var result = new List<RestaurantMenu>();
 
@@ -19,7 +19,7 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
         {
             logger.LogDebug("Reading menu for restaurant {RestaurantName} from address {RestaurantAddress}", restaurant.Name, restaurant.Url);
 
-            var document = GetMenu(restaurant);
+            var document = await GetMenu(restaurant);
             if (document is null)
             {
                 logger.LogWarning("Failed to get menu from {RestaurantName}. Check logged exceptions", restaurant.Name);
@@ -60,7 +60,7 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
         return result;
     }
 
-    private HtmlDocument? GetMenu(Restaurant restaurant)
+    private async Task<HtmlDocument?> GetMenu(Restaurant restaurant)
     {
         HtmlDocument document = new();
 
@@ -70,7 +70,12 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
             {
                 using var client = new HttpClient();
 
-                var requestResult = client.GetByteArrayAsync(restaurant.Url).Result;
+                var response = await client.GetAsync(restaurant.Url);
+
+                if (response.IsSuccessStatusCode is false)
+                    throw new Exception("Response returned with non-success status code");
+
+                var requestResult = await response.Content.ReadAsByteArrayAsync();
 
                 var data = restaurant.Url.Contains("makalu")
                     ? Encoding.UTF8.GetString(requestResult)
@@ -82,7 +87,7 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
             catch (Exception e)
             {
                 logger.LogWarning("Failed to get menu from {RestaurantName}. Attempt: {Attempt}. Exception: {Exception}", restaurant.Name, i, e);
-                Task.Delay(settings.AttemptDelay);
+                await Task.Delay(settings.AttemptDelay);
             }
         }
 

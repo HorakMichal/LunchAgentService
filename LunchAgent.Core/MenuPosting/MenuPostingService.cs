@@ -24,7 +24,7 @@ public sealed class MenuPostingService(
         var restaurants = restaurantService.Get();
 
         logger.LogInformation("Getting menus for restaurants.");
-        var menus = menuReadingService.GetMenus(restaurants);
+        var menus = await menuReadingService.GetMenus(restaurants);
 
         logger.LogInformation("Getting available spaces.");
         var spaces = await googleChatService.GetSpaces();

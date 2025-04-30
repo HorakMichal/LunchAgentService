@@ -5,5 +5,5 @@ namespace LunchAgent.Core.Menus;
 
 public interface IMenuReadingService
 {
-    List<RestaurantMenu> GetMenus(IReadOnlyCollection<Restaurant> restaurants);
+    Task<List<RestaurantMenu>> GetMenus(IReadOnlyCollection<Restaurant> restaurants);
 }

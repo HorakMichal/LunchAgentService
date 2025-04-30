@@ -37,8 +37,8 @@ public sealed class Worker(
         var restaurantService = new RestaurantService();
         var menuReadingService = new MenuReadingService(logger, htmlClientSettings.Value);
 
-        var menus = menuReadingService
-            .GetMenus(restaurantService.Get())
+        var menus = (await menuReadingService
+            .GetMenus(restaurantService.Get()))
             .CreateMenuMessages(settings.Value.MaximumMessageSize ?? int.MaxValue);
 
         var client = clientFactory.CreateClient();
