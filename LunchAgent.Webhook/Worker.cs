@@ -3,6 +3,7 @@ using LunchAgent.Core.Menus.Entities;
 using LunchAgent.Core.Restaurants;
 using Microsoft.Extensions.Options;
 using NCrontab;
+using System.Net.Http.Json;
 
 namespace LunchAgent.Webhook;
 
@@ -17,7 +18,7 @@ public sealed class Worker(
         var schedule = CrontabSchedule.Parse(settings.Value.Timing);
         while (!stoppingToken.IsCancellationRequested)
         {
-            var now = DateTime.UtcNow;
+            var now = await GetTime();
             var nextExecutionTime = schedule.GetNextOccurrence(now);
             var remainingTime = nextExecutionTime - now;
 
@@ -28,6 +29,33 @@ public sealed class Worker(
 
             await PostMenus();
         }
+    }
+
+    // Because of issues with time changes, we get try getting time from the internet
+    private async Task<DateTime> GetTime()
+    {
+        var client = clientFactory.CreateClient();
+
+        var response = await client.GetAsync("https://worldtimeapi.org/api/timezone/Europe/Prague");
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogError("Request to World Time Api ended with code: {Code}. Using local time", response.StatusCode);
+            return DateTime.UtcNow;
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<WorldTimeApiData>();
+        if (result is null)
+        {
+            logger.LogError("Could not read World Time Api response. Using local time");
+            return DateTime.UtcNow;
+        }
+
+        if (DateTime.TryParse(result.Datetime, out var datetime)) 
+            return datetime;
+
+        logger.LogError("Could not parse datetime. Using local time");
+        return DateTime.UtcNow;
+
     }
 
     private async Task PostMenus()
