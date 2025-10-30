@@ -36,7 +36,18 @@ public sealed class Worker(
     {
         var client = clientFactory.CreateClient();
 
-        var response = await client.GetAsync("https://worldtimeapi.org/api/timezone/Europe/Prague");
+        HttpResponseMessage? response;
+
+        try
+        {
+            response = await client.GetAsync("https://worldtimeapi.org/api/timezone/Europe/Prague");
+        }
+        catch (Exception e)
+        {
+            logger.LogError("GetAsync to World Time Api failed with: {Exception}", e);
+            return DateTime.UtcNow;
+        }
+
         if (!response.IsSuccessStatusCode)
         {
             logger.LogError("Request to World Time Api ended with code: {Code}. Using local time", response.StatusCode);
