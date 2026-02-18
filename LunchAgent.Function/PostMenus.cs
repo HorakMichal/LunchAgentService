@@ -36,7 +36,7 @@ public static class PostMenus
         var restaurantService = new RestaurantService();
         var menuReadingService = new MenuReadingService(logger, settings);
 
-        menuReadingService.GetMenus(restaurantService.Get());
+        await menuReadingService.GetMenus(restaurantService.Get());
         
         var googleChatService = new GoogleChatService(googleCreds);
         var storedMessagesService = new StoredMessagesService(storageAccountConnectionString);
