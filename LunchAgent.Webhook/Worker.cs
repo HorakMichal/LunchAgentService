@@ -15,6 +15,8 @@ public sealed class Worker(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        logger.LogInformation("Machine name: {Name}", Environment.MachineName);
+
         var schedule = CrontabSchedule.Parse(settings.Value.Timing);
         while (!stoppingToken.IsCancellationRequested)
         {

@@ -16,7 +16,7 @@ RUN dotnet publish LunchAgent.Webhook/LunchAgent.Webhook.csproj \
 	-c Release \
 	-o /app
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime:10.0
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:10.0
 WORKDIR /app
 COPY --from=build /app .
 
