@@ -1,17 +1,22 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG TARGETARCH
+WORKDIR /source
 
-COPY LunchAgent.Core/LunchAgent.Core.csproj src/LunchAgent.Core/
-COPY LunchAgent.Webhook/LunchAgent.Webhook.csproj src/LunchAgent.Webhook/
+COPY LunchAgent.Core/LunchAgent.Core.csproj LunchAgent.Core/
+COPY LunchAgent.Webhook/LunchAgent.Webhook.csproj LunchAgent.Webhook/
 
-RUN dotnet restore src/LunchAgent.Webhook/LunchAgent.Webhook.csproj
+COPY Directory.Build.props ./
 
-COPY LunchAgent.Core/. src/LunchAgent.Core/
-COPY LunchAgent.Webhook/. src/LunchAgent.Webhook/
+RUN dotnet restore -a $TARGETARCH LunchAgent.Webhook/LunchAgent.Webhook.csproj
 
-RUN dotnet publish src/LunchAgent.Webhook/LunchAgent.Webhook.csproj -c Release -o /app
+COPY . .
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+RUN dotnet publish LunchAgent.Webhook/LunchAgent.Webhook.csproj \
+	-a $TARGETARCH \
+	-c Release \
+	-o /app
+
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime:10.0
 WORKDIR /app
 COPY --from=build /app .
 

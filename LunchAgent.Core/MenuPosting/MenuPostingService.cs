@@ -34,7 +34,7 @@ public sealed class MenuPostingService(
         logger.LogInformation("Start sending messages.");
         foreach (var space in spaces)
         {
-            logger.LogInformation("Sending message to {spaceName} ({spaceId}) space.", space.DisplayName, space.Name);
+            logger.LogInformation("Sending message to {SpaceName} ({SpaceId}) space.", space.DisplayName, space.Name);
 
             var storedMessageName = await storedMessagesService.Get(space.Name, today);
 

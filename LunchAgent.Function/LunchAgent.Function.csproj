@@ -1,15 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+
+	<PropertyGroup>
         <AzureFunctionsVersion>V4</AzureFunctionsVersion>
         <UserSecretsId>671e14df-62de-49cd-aa29-3bfc5a9e031c</UserSecretsId>
     </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Google.Apis.Auth" Version="1.73.0" />
         <PackageReference Include="Google.Apis.HangoutsChat.v1" Version="1.73.0.4053" />
         <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="5.2.1" />
         <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.6.0" />
     </ItemGroup>
+
     <ItemGroup>
         <None Update="host.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -19,7 +21,9 @@
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
     </ItemGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\LunchAgent.Core\LunchAgent.Core.csproj" />
     </ItemGroup>
+
 </Project>

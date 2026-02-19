@@ -19,7 +19,7 @@ public sealed class Worker(
         while (!stoppingToken.IsCancellationRequested)
         {
             var now = await GetTime();
-            var nextExecutionTime = schedule.GetNextOccurrence(now);
+            var nextExecutionTime = schedule.GetNextOccurrence(now.LocalDateTime);
             var remainingTime = nextExecutionTime - now;
 
             logger.LogInformation("Next menu post will happen at {NextTime} UTC.", nextExecutionTime);
@@ -32,7 +32,7 @@ public sealed class Worker(
     }
 
     // Because of issues with time changes, we get try getting time from the internet
-    private async Task<DateTime> GetTime()
+    private async Task<DateTimeOffset> GetTime()
     {
         var client = clientFactory.CreateClient();
 
@@ -40,7 +40,7 @@ public sealed class Worker(
 
         try
         {
-            response = await client.GetAsync("https://worldtimeapi.org/api/timezone/Europe/Prague");
+            response = await client.GetAsync("https://time.now/developer/api/timezone/Europe/Prague");
         }
         catch (Exception e)
         {
@@ -61,7 +61,7 @@ public sealed class Worker(
             return DateTime.UtcNow;
         }
 
-        if (DateTime.TryParse(result.Datetime, out var datetime)) 
+        if (DateTimeOffset.TryParse(result.Datetime, out var datetime)) 
             return datetime;
 
         logger.LogError("Could not parse datetime. Using local time");
