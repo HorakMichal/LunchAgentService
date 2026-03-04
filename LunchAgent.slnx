@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="LunchAgent.API.Dockerfile" />
+    <File Path="LunchAgent.Webhook.Dockerfile" />
+  </Folder>
+  <Project Path="LunchAgent.API/LunchAgent.API.csproj" />
+  <Project Path="LunchAgent.Core/LunchAgent.Core.csproj" />
+  <Project Path="LunchAgent.Function/LunchAgent.Function.csproj" />
+  <Project Path="LunchAgent.Webhook/LunchAgent.Webhook.csproj" />
+</Solution>
