@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.54" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LunchAgent.Core\LunchAgent.Core.csproj" />
+  </ItemGroup>
+
+</Project>

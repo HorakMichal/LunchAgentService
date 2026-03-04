@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.2.11415.280 d18.0
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LunchAgent.Function", "LunchAgent.Function\LunchAgent.Function.csproj", "{F41C66CB-6265-47D6-9C16-60260ED1CE59}"
 EndProject
@@ -11,9 +11,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LunchAgent.Webhook", "Lunch
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{92B118C9-3BBA-455C-A8CC-2B88F2AFF852}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
-		LunchAgentService.Dockerfile = LunchAgentService.Dockerfile
+		LunchAgent.API.Dockerfile = LunchAgent.API.Dockerfile
+		LunchAgent.Webhook.Dockerfile = LunchAgent.Webhook.Dockerfile
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LunchAgent.API", "LunchAgent.API\LunchAgent.API.csproj", "{DC6104FC-02A2-42AF-88B8-2B4410C7C510}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,10 @@ Global
 		{F420240C-419F-4A59-BC62-5E29A03E3421}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F420240C-419F-4A59-BC62-5E29A03E3421}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F420240C-419F-4A59-BC62-5E29A03E3421}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC6104FC-02A2-42AF-88B8-2B4410C7C510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC6104FC-02A2-42AF-88B8-2B4410C7C510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC6104FC-02A2-42AF-88B8-2B4410C7C510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC6104FC-02A2-42AF-88B8-2B4410C7C510}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
