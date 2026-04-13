@@ -70,7 +70,9 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
             {
                 using var client = new HttpClient();
 
-                var response = await client.GetAsync(restaurant.Url);
+                var response = restaurant.Url.Contains("makalu") 
+                    ? await client.GetAsync(restaurant.Url)
+                    : await client.GetAsync(restaurant.Url + "&datum=dnes");
 
                 if (response.IsSuccessStatusCode is false)
                     throw new Exception("Response returned with non-success status code");

@@ -57,7 +57,7 @@ public static class MenuFormatting
 
         var items = string.Join("\n", soups, mains).Trim('\n');
 
-        message.Append($"{menu.Restaurant.Emoji} *{menu.Restaurant.Name}:* \n {items}\n\n");
+        message.Append($"{menu.Restaurant.Emoji} *<{menu.Restaurant.Url}|{menu.Restaurant.Name}>:* \n {items}\n\n");
 
         return message;
     }

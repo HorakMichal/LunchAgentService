@@ -21,6 +21,10 @@ public sealed class Worker(
         while (!stoppingToken.IsCancellationRequested)
         {
             var now = await GetTime();
+
+            // Force offset to be always +1, ignoring changes between summer and winter time
+            now = now.ToOffset(TimeSpan.FromHours(1)); 
+
             var nextExecutionTime = schedule.GetNextOccurrence(now.LocalDateTime);
             var remainingTime = nextExecutionTime - now;
 
