@@ -22,11 +22,16 @@ public sealed class Worker(
         {
             var now = await GetTime();
 
-            // Force offset to be always +1, ignoring changes between summer and winter time
-            now = now.ToOffset(TimeSpan.FromHours(1)); 
+            logger.LogDebug("Current time: {Time}", now);
 
-            var nextExecutionTime = schedule.GetNextOccurrence(now.LocalDateTime);
-            var remainingTime = nextExecutionTime - now;
+            // Force offset to be always +1, hopefully ignoring changes between summer and winter time
+            var currentTime = now.UtcDateTime.AddHours(1);
+            logger.LogDebug("Current modified UTC time: {Time}", currentTime);
+
+            var nextExecutionTime = schedule.GetNextOccurrence(currentTime);
+            var remainingTime = nextExecutionTime - currentTime;
+            if (remainingTime < TimeSpan.Zero)
+                remainingTime = remainingTime.Add(TimeSpan.FromDays(1));
 
             logger.LogInformation("Next menu post will happen at {NextTime} UTC.", nextExecutionTime);
             logger.LogDebug("Next post in {Minutes} minutes.", Math.Round(remainingTime.TotalMinutes));
