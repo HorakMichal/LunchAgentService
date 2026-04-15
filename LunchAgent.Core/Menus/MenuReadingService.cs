@@ -9,6 +9,8 @@ namespace LunchAgent.Core.Menus;
 
 public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settings) : IMenuReadingService
 {
+    private static List<string> _soupKeywords = ["polévka", "soup"];
+
     public async Task<List<RestaurantMenu>> GetMenus(IReadOnlyCollection<Restaurant> restaurants)
     {
         var result = new List<RestaurantMenu>();
@@ -150,14 +152,22 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
         var menuItems = menuNodes.Select(node =>
         {
             var childNodes = node.Descendants("td").ToList();
-            var isSoup = node.InnerText.Contains("polévka", StringComparison.InvariantCultureIgnoreCase);
+            var isSoup = _soupKeywords.Any(keyword => node.InnerText.Contains(keyword, StringComparison.InvariantCultureIgnoreCase));
+            if (isSoup)
+                return new RestaurantMenuItem
+                {
+                    FoodType = FoodType.Soup,
+                    Index = string.Empty,
+                    Description = childNodes[0].InnerText.Trim() + " / " + childNodes[1].InnerText.Trim(),
+                    Price = string.Empty
+                };
 
             return new RestaurantMenuItem
             {
-                FoodType = isSoup ? FoodType.Soup : FoodType.Main,
-                Index = isSoup ? string.Empty : childNodes[0].InnerText.Trim(),
-                Description = childNodes[isSoup ? 0 : 1].InnerText.Trim() + (isSoup ? " / " + childNodes[1].InnerText.Trim() : " " + childNodes[2].InnerText.Trim()),
-                Price = isSoup ? string.Empty : childNodes[3].InnerText.Trim()
+                FoodType = FoodType.Main,
+                Index = childNodes[0].InnerText.Trim(),
+                Description = childNodes[1].InnerText.Trim() + " " + childNodes[2].InnerText.Trim(),
+                Price = childNodes[3].InnerText.Trim()
             };
         }).ToList();
 
