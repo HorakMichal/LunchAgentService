@@ -9,7 +9,8 @@ namespace LunchAgent.Core.Menus;
 
 public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settings) : IMenuReadingService
 {
-    private static List<string> _soupKeywords = ["polévka", "soup"];
+    private static readonly List<string> SoupKeywords = ["polévka", "soup"];
+    private static readonly HttpClient Client = new();
 
     public async Task<List<RestaurantMenu>> GetMenus(IReadOnlyCollection<Restaurant> restaurants)
     {
@@ -70,20 +71,16 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
         {
             try
             {
-                using var client = new HttpClient();
-
                 var response = restaurant.Url.Contains("makalu") 
-                    ? await client.GetAsync(restaurant.Url)
-                    : await client.GetAsync(restaurant.Url + "&datum=dnes");
+                    ? await Client.GetAsync(restaurant.Url)
+                    : await Client.GetAsync(restaurant.Url + "&datum=dnes");
 
                 if (response.IsSuccessStatusCode is false)
                     throw new Exception("Response returned with non-success status code");
 
                 var requestResult = await response.Content.ReadAsByteArrayAsync();
 
-                var data = restaurant.Url.Contains("makalu")
-                    ? Encoding.UTF8.GetString(requestResult)
-                    : Encoding.GetEncoding(1250).GetString(requestResult);
+                var data = Encoding.UTF8.GetString(requestResult);
 
                 document.LoadHtml(data);
                 return document;
@@ -107,17 +104,19 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
 
         foreach (var food in foodMenus)
         {
-            var item = new RestaurantMenuItem();
+            var descriptionText = food.SelectNodes(".//td").Single(x => x.GetClasses().Contains("food")).InnerText;
+
+            var item = new RestaurantMenuItem
+            {
+                Description = Regex.Replace(descriptionText, @"[\t\r\n]|\d+.?", string.Empty),
+                Price = food.SelectNodes(".//td").Single(x => x.GetClasses().Contains("prize")).InnerText
+            };
 
             if (food.GetClasses().Contains("soup"))
             {
                 item = item with
                 {
                     FoodType = FoodType.Soup,
-                    Description = Regex.Replace(
-                        food.SelectNodes(".//td").Single(x => x.GetClasses().Contains("food")).InnerText,
-                        "\\d+.?", string.Empty),
-                    Price = food.SelectNodes(".//td").Single(x => x.GetClasses().Contains("prize")).InnerText
                 };
             }
             else
@@ -125,10 +124,6 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
                 item = item with
                 {
                     FoodType = FoodType.Main,
-                    Description = Regex.Replace(
-                        food.SelectNodes(".//td").Single(x => x.GetClasses().Contains("food")).InnerText,
-                        "\\d+.?", string.Empty),
-                    Price = food.SelectNodes(".//td").Single(x => x.GetClasses().Contains("prize")).InnerText,
                     Index = food.SelectNodes(".//td").Single(x => x.GetClasses().Contains("no")).InnerText,
                 };
             }
@@ -152,7 +147,7 @@ public sealed class MenuReadingService(ILogger logger, HtmlClientSettings settin
         var menuItems = menuNodes.Select(node =>
         {
             var childNodes = node.Descendants("td").ToList();
-            var isSoup = _soupKeywords.Any(keyword => node.InnerText.Contains(keyword, StringComparison.InvariantCultureIgnoreCase));
+            var isSoup = SoupKeywords.Any(keyword => node.InnerText.Contains(keyword, StringComparison.InvariantCultureIgnoreCase));
             if (isSoup)
                 return new RestaurantMenuItem
                 {
