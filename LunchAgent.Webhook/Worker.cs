@@ -24,16 +24,16 @@ public sealed class Worker(
 
             logger.LogDebug("Current time: {Time}", now);
 
-            // Force offset to be always +1, hopefully ignoring changes between summer and winter time
-            var currentTime = now.UtcDateTime.AddHours(1);
-            logger.LogDebug("Current modified UTC time: {Time}", currentTime);
+            // Schedule is evaluated in Prague local time (DST-aware offset comes from GetTime)
+            var currentTime = now.DateTime;
+            logger.LogDebug("Current Prague time: {Time}", currentTime);
 
             var nextExecutionTime = schedule.GetNextOccurrence(currentTime);
             var remainingTime = nextExecutionTime - currentTime;
             if (remainingTime < TimeSpan.Zero)
                 remainingTime = remainingTime.Add(TimeSpan.FromDays(1));
 
-            logger.LogInformation("Next menu post will happen at {NextTime} UTC.", nextExecutionTime);
+            logger.LogInformation("Next menu post will happen at {NextTime} Prague time.", nextExecutionTime);
             logger.LogDebug("Next post in {Minutes} minutes.", Math.Round(remainingTime.TotalMinutes));
 
             await Task.Delay(remainingTime, stoppingToken);
@@ -56,28 +56,41 @@ public sealed class Worker(
         catch (Exception e)
         {
             logger.LogError("GetAsync to World Time Api failed with: {Exception}", e);
-            return DateTime.UtcNow;
+            return GetPragueTimeFallback();
         }
 
         if (!response.IsSuccessStatusCode)
         {
             logger.LogError("Request to World Time Api ended with code: {Code}. Using local time", response.StatusCode);
-            return DateTime.UtcNow;
+            return GetPragueTimeFallback();
         }
 
         var result = await response.Content.ReadFromJsonAsync<WorldTimeApiData>();
         if (result is null)
         {
             logger.LogError("Could not read World Time Api response. Using local time");
-            return DateTime.UtcNow;
+            return GetPragueTimeFallback();
         }
 
         if (DateTimeOffset.TryParse(result.Datetime, out var datetime)) 
             return datetime;
 
         logger.LogError("Could not parse datetime. Using local time");
-        return DateTime.UtcNow;
+        return GetPragueTimeFallback();
 
+    }
+
+    private DateTimeOffset GetPragueTimeFallback()
+    {
+        try
+        {
+            return TimeZoneInfo.ConvertTime(DateTimeOffset.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Europe/Prague"));
+        }
+        catch (Exception e)
+        {
+            logger.LogError("Europe/Prague time zone not available, using UTC: {Exception}", e);
+            return DateTimeOffset.UtcNow;
+        }
     }
 
     private async Task PostMenus()
