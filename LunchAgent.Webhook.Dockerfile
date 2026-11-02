@@ -6,6 +6,7 @@ COPY LunchAgent.Core/LunchAgent.Core.csproj LunchAgent.Core/
 COPY LunchAgent.Webhook/LunchAgent.Webhook.csproj LunchAgent.Webhook/
 
 COPY Directory.Build.props ./
+COPY Directory.Packages.props ./
 
 RUN dotnet restore -a $TARGETARCH LunchAgent.Webhook/LunchAgent.Webhook.csproj
 

@@ -6,6 +6,7 @@ COPY LunchAgent.Core/LunchAgent.Core.csproj LunchAgent.Core/
 COPY LunchAgent.API/LunchAgent.API.csproj LunchAgent.API/
 
 COPY Directory.Build.props ./
+COPY Directory.Packages.props ./
 
 RUN dotnet restore -a $TARGETARCH LunchAgent.API/LunchAgent.API.csproj
 
