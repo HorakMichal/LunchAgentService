@@ -1,0 +1,20 @@
+<Project>
+	<PropertyGroup>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageVersion Include="Azure.Data.Tables" Version="12.13.0" />
+		<PackageVersion Include="Google.Apis.Auth" Version="1.78.0" />
+		<PackageVersion Include="Google.Apis.HangoutsChat.v1" Version="1.77.0.4312" />
+		<PackageVersion Include="HtmlAgilityPack" Version="1.13.1" />
+		<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
+		<PackageVersion Include="Microsoft.Azure.WebJobs.Extensions" Version="5.2.1" />
+		<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+		<PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.14" />
+		<PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.14" />
+		<PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.14" />
+		<PackageVersion Include="Microsoft.NET.Sdk.Functions" Version="4.6.0" />
+		<PackageVersion Include="NCrontab.Scheduler" Version="2.1.23" />
+		<PackageVersion Include="Scalar.AspNetCore" Version="2.18.7" />
+	</ItemGroup>
+</Project>

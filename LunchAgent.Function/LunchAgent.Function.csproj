@@ -6,10 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Apis.Auth" Version="1.73.0" />
-        <PackageReference Include="Google.Apis.HangoutsChat.v1" Version="1.73.0.4053" />
-        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="5.2.1" />
-        <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.6.0" />
+        <PackageReference Include="Google.Apis.Auth" />
+        <PackageReference Include="Google.Apis.HangoutsChat.v1" />
+        <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" />
+        <PackageReference Include="Microsoft.NET.Sdk.Functions" />
     </ItemGroup>
 
     <ItemGroup>
